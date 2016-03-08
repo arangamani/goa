@@ -83,8 +83,9 @@ func New(name string) *Service {
 // See NewMiddleware for wrapping goa and http handlers into goa middleware.
 // goa comes with a set of commonly used middleware, see middleware.go.
 // Controller specific middleware should be mounted using the Controller type Use method instead.
-func (service *Service) Use(m Middleware) {
+func (service *Service) Use(m Middleware) *Service {
 	service.Middleware = append(service.Middleware, m)
+	return service
 }
 
 // ListenAndServe starts a HTTP server and sets up a listener on the given host/port.
@@ -160,8 +161,9 @@ func (service *Service) ServeFiles(path, filename string) error {
 // Use adds a middleware to the controller.
 // See NewMiddleware for wrapping goa and http handlers into goa middleware.
 // goa comes with a set of commonly used middleware, see middleware.go.
-func (ctrl *Controller) Use(m Middleware) {
+func (ctrl *Controller) Use(m Middleware) *Controller {
 	ctrl.Middleware = append(ctrl.Middleware, m)
+	return ctrl
 }
 
 // MiddlewareChain returns the set of middleware that must be applied to requests sent to the
