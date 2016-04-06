@@ -542,35 +542,37 @@ func (o Object) IterateAttributes(it AttributeIterator) error {
 }
 
 // ToSlice converts an ArrayVal to a slice.
-func (a ArrayVal) ToSlice() []interface{} {
+func (a ArrayVal) ToSlice(d *AttributeDefinition) interface{} {
 	arr := make([]interface{}, len(a))
+	elemType := d.Type.ToArray().ElemType
 	for i, elem := range a {
 		switch actual := elem.(type) {
 		case ArrayVal:
-			arr[i] = actual.ToSlice()
+			arr[i] = actual.ToSlice(elemType)
 		case HashVal:
-			arr[i] = actual.ToMap()
+			arr[i] = actual.ToMap(elemType)
 		default:
 			arr[i] = actual
 		}
 	}
-	return arr
+	return d.Type.ToArray().MakeSlice(arr)
 }
 
 // ToMap converts a HashVal to a map.
-func (h HashVal) ToMap() map[interface{}]interface{} {
+func (h HashVal) ToMap(d *AttributeDefinition) interface{} {
 	mp := make(map[interface{}]interface{}, len(h))
+	elemType := d.Type.ToHash().ElemType
 	for k, v := range h {
 		switch actual := v.(type) {
 		case ArrayVal:
-			mp[k] = actual.ToSlice()
+			mp[k] = actual.ToSlice(elemType)
 		case HashVal:
-			mp[k] = actual.ToMap()
+			mp[k] = actual.ToMap(elemType)
 		default:
 			mp[k] = actual
 		}
 	}
-	return mp
+	return d.Type.ToHash().MakeMap(mp)
 }
 
 // NewUserTypeDefinition creates a user type definition but does not

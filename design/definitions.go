@@ -881,9 +881,9 @@ func (a *AttributeDefinition) HasDefaultValue(attName string) bool {
 func (a *AttributeDefinition) SetDefault(def interface{}) {
 	switch actual := def.(type) {
 	case HashVal:
-		a.DefaultValue = actual.ToMap()
+		a.DefaultValue = actual.ToMap(a)
 	case ArrayVal:
-		a.DefaultValue = actual.ToSlice()
+		a.DefaultValue = actual.ToSlice(a)
 	default:
 		a.DefaultValue = actual
 	}
@@ -899,9 +899,9 @@ func (a *AttributeDefinition) AddValues(values []interface{}) {
 	for i, v := range values {
 		switch actual := v.(type) {
 		case HashVal:
-			a.Validation.Values[i] = actual.ToMap()
+			a.Validation.Values[i] = actual.ToMap(a)
 		case ArrayVal:
-			a.Validation.Values[i] = actual.ToSlice()
+			a.Validation.Values[i] = actual.ToSlice(a)
 		default:
 			a.Validation.Values[i] = actual
 		}

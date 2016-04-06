@@ -1,7 +1,6 @@
 package codegen
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 	"text/template"
@@ -49,7 +48,7 @@ func RecursiveFinalizer(att *design.AttributeDefinition, target string, depth in
 					"field":      n,
 					"catt":       catt,
 					"depth":      depth,
-					"defaultVal": printVal(catt.Type, catt.DefaultValue),
+					"defaultVal": fmt.Sprintf("%#v", catt.DefaultValue),
 				}
 				assignments = append(assignments, RunTemplate(assignmentT, data))
 			}
@@ -79,49 +78,6 @@ func RecursiveFinalizer(att *design.AttributeDefinition, target string, depth in
 		}
 	}
 	return strings.Join(assignments, "\n")
-}
-
-// printVal prints the given value corresponding to the given data type.
-// The value is already checked for the compatibility with the data type.
-func printVal(t design.DataType, val interface{}) string {
-	switch {
-	case t.IsPrimitive():
-		// For primitive types, simply print the value
-		return fmt.Sprintf("%#v", val)
-	case t.IsHash():
-		// The input is a hash
-		h := t.ToHash()
-		hval := val.(map[interface{}]interface{})
-		if len(hval) == 0 {
-			return fmt.Sprintf("%s{}", GoPackageTypeName(t, nil, 0, false))
-		}
-		var buffer bytes.Buffer
-		buffer.WriteString(fmt.Sprintf("%s{", GoPackageTypeName(t, nil, 0, false)))
-		for k, v := range hval {
-			buffer.WriteString(fmt.Sprintf("%s: %s, ", printVal(h.KeyType.Type, k), printVal(h.ElemType.Type, v)))
-		}
-		buffer.Truncate(buffer.Len() - 2) // remove ", "
-		buffer.WriteString("}")
-		return buffer.String()
-	case t.IsArray():
-		// Input is an array
-		a := t.ToArray()
-		aval := val.([]interface{})
-		if len(aval) == 0 {
-			return fmt.Sprintf("%s{}", GoPackageTypeName(t, nil, 0, false))
-		}
-		var buffer bytes.Buffer
-		buffer.WriteString(fmt.Sprintf("%s{", GoPackageTypeName(t, nil, 0, false)))
-		for _, e := range aval {
-			buffer.WriteString(fmt.Sprintf("%s, ", printVal(a.ElemType.Type, e)))
-		}
-		buffer.Truncate(buffer.Len() - 2) // remove ", "
-		buffer.WriteString("}")
-		return buffer.String()
-	default:
-		// shouldn't happen as the value's compatibility is already checked.
-		panic("unknown type")
-	}
 }
 
 const (

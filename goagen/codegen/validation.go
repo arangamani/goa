@@ -93,6 +93,10 @@ func RecursiveChecker(att *design.AttributeDefinition, nonzero, required, hasDef
 			return nil
 		})
 	} else if a := att.Type.ToArray(); a != nil {
+		validation := ValidationChecker(att, nonzero, required, hasDefault, target, context, depth, private)
+		if validation != "" {
+			checks = append(checks, validation)
+		}
 		data := map[string]interface{}{
 			"elemType": a.ElemType,
 			"context":  context,
@@ -100,7 +104,7 @@ func RecursiveChecker(att *design.AttributeDefinition, nonzero, required, hasDef
 			"depth":    1,
 			"private":  private,
 		}
-		validation := RunTemplate(arrayValT, data)
+		validation = RunTemplate(arrayValT, data)
 		if validation != "" {
 			checks = append(checks, validation)
 		}
@@ -210,7 +214,7 @@ func validationsCode(validation *dslengine.ValidationDefinition, data map[string
 func oneof(target string, vals []interface{}) string {
 	elems := make([]string, len(vals))
 	for i, v := range vals {
-		elems[i] = fmt.Sprintf("%s == %#v", target, v)
+		elems[i] = fmt.Sprintf("reflect.DeepEqual(%s, %#v)", target, v)
 	}
 	return strings.Join(elems, " || ")
 }

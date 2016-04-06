@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"sort"
 	"strings"
 
@@ -419,10 +420,10 @@ func (a *AttributeDefinition) Validate(ctx string, parent dslengine.Definition) 
 	// If both Default and Enum are given, make sure the Default value is one of Enum values.
 	// TODO: We only do the default value and enum check just for primitive types.
 	// Issue 388 (https://github.com/goadesign/goa/issues/388) will address this for other types.
-	if a.Type.IsPrimitive() && a.DefaultValue != nil && a.Validation != nil && a.Validation.Values != nil {
+	if a.DefaultValue != nil && a.Validation != nil && a.Validation.Values != nil {
 		var found bool
 		for _, e := range a.Validation.Values {
-			if e == a.DefaultValue {
+			if reflect.DeepEqual(e, a.DefaultValue) {
 				found = true
 				break
 			}

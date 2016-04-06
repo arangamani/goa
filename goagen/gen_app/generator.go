@@ -155,6 +155,7 @@ func (g *Generator) generateContexts(api *design.APIDefinition) error {
 		codegen.SimpleImport("golang.org/x/net/context"),
 		codegen.SimpleImport("strconv"),
 		codegen.SimpleImport("strings"),
+		codegen.SimpleImport("reflect"),
 		codegen.SimpleImport("time"),
 		codegen.SimpleImport("github.com/goadesign/goa"),
 	}
@@ -521,6 +522,7 @@ func (g *Generator) generateMediaTypes(api *design.APIDefinition) error {
 		codegen.SimpleImport("github.com/goadesign/goa"),
 		codegen.SimpleImport("fmt"),
 		codegen.SimpleImport("time"),
+		codegen.SimpleImport("reflect"),
 	}
 	mtWr.WriteHeader(title, TargetPackage, imports)
 	err = api.IterateMediaTypes(func(mt *design.MediaTypeDefinition) error {
@@ -552,6 +554,7 @@ func (g *Generator) generateUserTypes(api *design.APIDefinition) error {
 		codegen.SimpleImport("github.com/goadesign/goa"),
 		codegen.SimpleImport("fmt"),
 		codegen.SimpleImport("time"),
+		codegen.SimpleImport("reflect"),
 	}
 	utWr.WriteHeader(title, TargetPackage, imports)
 	err = api.IterateUserTypes(func(t *design.UserTypeDefinition) error {
